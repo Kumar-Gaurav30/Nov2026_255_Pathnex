@@ -1,0 +1,4 @@
+1 Hour 30 min - Git
+1 Hour 30 Mins - AWS
+2 Hours - Kubernetes
+
