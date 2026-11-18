@@ -1,4 +1,6 @@
-30 Mins - Git
+45 Mins - Git
+1 Hour = Jenkins
+1 Hour = Ansible
 2 Hour - AWS
 2 Hours - Kubernetes
 30 Mins - Practice English Speaking
