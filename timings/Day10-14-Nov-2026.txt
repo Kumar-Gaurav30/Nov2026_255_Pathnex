@@ -1,0 +1,6 @@
+1 Hour - Git
+1 Hour - Terraform
+2 Hours - Kubernetes
+1 Hour - Jenkins
+30 Mins - Practice English Speaking
+
