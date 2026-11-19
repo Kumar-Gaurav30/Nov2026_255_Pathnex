@@ -1,0 +1,105 @@
+Ansible — when Condition
+
+---
+- name: Install tool based on OS
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install htop
+      yum:
+        name: htop
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+Terraform — Route Table + Association
+
+resource "aws_route_table" "PathnexRT" {
+  vpc_id = aws_vpc.PathnexVPC.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.PathnexIGW.id
+  }
+
+  tags = {
+    Name = "Pathnex-RouteTable"
+  }
+}
+
+
+Kubernetes — Secret
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pathnex-secret
+type: Opaque
+data:
+  password: cGF0aG5leDEyMw==
+
+echo 'cGF0aG5leDEyMw==' | base64 --decode
+
+kubectl apply -f secret.yaml
+kubectl get secrets
+kubectl get secret pathnex-secret
+kubectl get secret pathnex-secret -o yaml
+kubectl get secret pathnex-secret \
+  -o jsonpath='{.data.password}' | base64 --decode
+================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pathnex-pod
+spec:
+  containers:
+    - name: pathnex
+      image: nginx
+      env:
+        - name: APP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pathnex-secret
+              key: password
+
+Shell Script — For Loop  
+
+#!/bin/bash
+
+for i in {1..10}; do
+  echo "Number: $i"
+done
+
+
+Jenkins — Caching Maven Dependencies
+
+if [ -d ".m2" ]; then
+    echo "Using cached dependencies"
+else
+    mvn clean compile
+fi
+
+
+GitLab CI — Maven Dependency Cache
+
+cache:
+  key: maven-cache
+  paths:
+    - .m2/repository
+
+====================================
+stages:
+  - build
+
+build:
+  stage: build
+
+  image: maven:3.8.1-jdk-17
+
+  cache:
+    key: maven-cache
+    paths:
+      - .m2/repository
+
+  script:
+    - mvn clean compile
