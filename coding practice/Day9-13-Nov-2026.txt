@@ -1,0 +1,110 @@
+Ansible — Jinja2 Template
+
+---
+- name: Deploy template for Pathnex
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Copy template file
+      template:
+        src: pathnex.conf.j2
+        dest: /etc/pathnex.conf
+
+pathnex.conf.j2
+APP_NAME={{ app_name }}
+APP_ENV={{ app_env }}
+PORT={{ app_port }}
+
+/etc/pathnex.conf
+APP_NAME=Pathnex
+APP_ENV=production
+PORT=8080
+
+
+Terraform — Internet Gateway
+
+resource "aws_internet_gateway" "PathnexIGW" {
+  vpc_id = aws_vpc.PathnexVPC.id
+
+  tags = {
+    Name = "Pathnex-IGW"
+  }
+}
+
+Kubernetes — ConfigMap
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pathnex-config
+data:
+  APP_MODE: "production"
+  WELCOME_MSG: "Hello Pathnex"
+
+
+kubectl get configmap
+kubectl get configmap pathnex-config
+kubectl describe configmap pathnex-config
+kubectl get configmap pathnex-config -o yaml
+
+Using ConfigMap as environment variables
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pathnex-pod
+spec:
+  containers:
+    - name: pathnex
+      image: nginx
+      env:
+        - name: APP_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: pathnex-config
+              key: APP_MODE
+
+        - name: WELCOME_MSG
+          valueFrom:
+            configMapKeyRef:
+              name: pathnex-config
+              key: WELCOME_MSG
+
+Shell Script — Check CPU Load
+
+#!/bin/bash
+
+LOAD=$(uptime | awk -F'load averages?: ' '{print $2}')
+
+echo "Current CPU Load: $LOAD"
+
+
+Jenkins — Archive Artifacts
+
+archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+
+GitLab CI — Artifacts
+
+stages:
+  - build
+
+build:
+  stage: build
+  image: maven:3.8.1-jdk-17
+
+  script:
+    - git clone https://github.com/Pathnex/sample-java-app.git
+    - cd sample-java-app
+    - mvn clean package
+
+  artifacts:
+    paths:
+      - sample-java-app/target/*.jar
+    expire_in: 1 week
+
+
+
+
+
