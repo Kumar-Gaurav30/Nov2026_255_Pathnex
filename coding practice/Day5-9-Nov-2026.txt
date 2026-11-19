@@ -1,0 +1,91 @@
+Ansible:-
+
+tools.yml
+
+- name: Install packages for Pathnex
+  hosts: pathnex
+  become: true
+
+  tasks:
+    - name: Install tools
+      ansible.builtin.dnf:
+        name:
+          - git
+          - wget
+        state: present
+
+    - name: Check git version
+      ansible.builtin.command: git --version
+      register: git_version
+      changed_when: false
+
+    - name: Show git version
+      ansible.builtin.debug:
+        msg: "{{ git_version.stdout }}"
+
+ansible-playbook -i inventory.ini tools.yml --syntax-check
+ansible-playbook -i inventory.ini tools.yml --check --diff
+ansible-playbook -i inventory.ini tools.yml
+ansible-playbook -i inventory.ini tools.yml    # second run: changed=0
+
+nginx-content.yml:-
+
+- name: Manage Nginx content
+  hosts: pathnex
+  become: true
+
+  tasks:
+    - name: Deploy index.html
+      ansible.builtin.copy:
+        src: index.html
+        dest: /usr/share/nginx/html/index.html
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload Nginx
+
+  handlers:
+    - name: Reload Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+
+cd ~/ansible-nginx
+echo '<h1>Hello from Ansible</h1>' > index.html
+
+ansible-playbook -i inventory.ini nginx-content.yml --check --diff
+ansible-playbook -i inventory.ini nginx-content.yml
+
+Terraform — EC2 with User Data (c6a.12xlarge)
+
+resource "aws_instance" "PathnexEC2" {
+  ami           = "ami-0abcd1234abcd1234"
+  instance_type = "c6a.12xlarge"
+
+  user_data = <<EOF
+#!/bin/bash
+yum install -y httpd
+systemctl start httpd
+EOF
+
+  tags = {
+    Name = "Pathnex-EC2"
+  }
+}
+
+Kubernetes — Resource Limits
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pathnex-limited-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+
+
