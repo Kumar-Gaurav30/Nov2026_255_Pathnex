@@ -1,5 +1,8 @@
-30 Mins - Git
+45 Mins - Git
 2 Hour - AWS
+1 Hours - Terraform
 2 Hours - Kubernetes
+30 Min - Maven
+30 Min - Gitlab
 30 Mins - Practice English Speaking
 
