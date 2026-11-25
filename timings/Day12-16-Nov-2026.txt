@@ -1,0 +1,6 @@
+30 Mins - Gitlab
+2 Hour - AWS
+2 Hours - Kubernetes
+30 Mins - Practice English Speaking
+30 Mins - Jenkins
+1 Hour - Terraform
